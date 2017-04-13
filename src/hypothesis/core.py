@@ -461,7 +461,7 @@ class StateForActualGivenExecution(object):
             data.mark_invalid()
         except (
             HypothesisDeprecationWarning, FailedHealthCheck,
-            StopTest,
+            StopTest, unittest.SkipTest,
         ):
             raise
         except Exception:
