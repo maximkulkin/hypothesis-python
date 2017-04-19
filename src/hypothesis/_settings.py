@@ -435,6 +435,37 @@ in which case no storage will be used.
 )
 
 
+def default_skip_exceptions():
+    import unittest
+    exceptions = [unittest.SkipTest]
+    try:
+        from unittest2 import SkipTest
+        exceptions.append(SkipTest)
+    except ImportError:
+        pass
+    try:
+        from pytest.runner import Skipped
+        exceptions.append(Skipped)
+    except ImportError:
+        pass
+    try:
+        from nose.plugins.skip import Skip as NoseSkip
+        exceptions.append(NoseSkip)
+    except ImportError:
+        pass
+    return tuple(exceptions)
+
+
+settings.define_setting(
+    'skip_exceptions',
+    default=default_skip_exceptions(),
+    show_default=False,
+    description="""
+Any exceptions that mean the test is being skipped.
+"""
+)
+
+
 @unique
 class Phase(IntEnum):
     explicit = 0

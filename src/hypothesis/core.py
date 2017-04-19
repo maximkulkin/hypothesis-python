@@ -49,6 +49,8 @@ from hypothesis.searchstrategy.strategies import SearchStrategy
 from hypothesis.internal.conjecture.engine import ExitReason, \
     ConjectureRunner
 
+import unittest
+
 
 def new_random():
     import random
@@ -461,8 +463,8 @@ class StateForActualGivenExecution(object):
             data.mark_invalid()
         except (
             HypothesisDeprecationWarning, FailedHealthCheck,
-            StopTest, unittest.SkipTest,
-        ):
+            StopTest
+        ) + Settings.skip_exceptions:
             raise
         except Exception:
             escalate_hypothesis_internal_error()
