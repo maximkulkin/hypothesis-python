@@ -32,7 +32,8 @@ from hypothesis.errors import Flaky, Timeout, NoSuchExample, \
     UnsatisfiedAssumption, HypothesisDeprecationWarning
 from hypothesis.control import BuildContext
 from hypothesis._settings import settings as Settings
-from hypothesis._settings import Phase, Verbosity, HealthCheck
+from hypothesis._settings import Phase, Verbosity, HealthCheck, \
+    note_deprecation
 from hypothesis.executors import new_style_executor, \
     default_new_style_executor
 from hypothesis.reporting import report, verbose_report, current_verbosity
@@ -242,6 +243,8 @@ def execute_explicit_examples(
 
 
 def fail_health_check(settings, message, label):
+    if not settings.perform_health_check:
+        return
     if label in settings.suppress_health_check:
         return
     message += (
@@ -478,10 +481,7 @@ class StateForActualGivenExecution(object):
         runner.run()
         note_engine_for_statistics(runner)
         run_time = time.time() - start_time
-        timed_out = (
-            self.settings.timeout > 0 and
-            run_time >= self.settings.timeout
-        )
+        timed_out = runner.exit_reason == ExitReason.timeout
         if runner.last_data is None:
             return
         if runner.last_data.status == Status.INTERESTING:
@@ -491,6 +491,19 @@ class StateForActualGivenExecution(object):
                     database_key, self.falsifying_example
                 )
         else:
+            if timed_out:
+                note_deprecation((
+                    'Your tests are hitting the settings timeout (%.2fs). '
+                    'This functionality will go away in a future release '
+                    'and you should not rely on it. Instead, try setting '
+                    'max_examples to be some value lower than %d (the number '
+                    'of examples your test successfully ran here). Or, if you '
+                    'would prefer your tests to run to completion, regardless '
+                    'of how long they take, you can set the timeout value to '
+                    'hypothesis.unlimited.'
+                ) % (
+                    self.settings.timeout, runner.valid_examples),
+                    self.settings)
             if runner.valid_examples < min(
                 self.settings.min_satisfying_examples,
                 self.settings.max_examples,
