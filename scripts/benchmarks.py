@@ -34,7 +34,7 @@ import numpy as np
 import attr
 import click
 import hypothesis.strategies as st
-from hypothesis import settings
+from hypothesis import settings, unlimited
 from scipy.stats import ttest_ind
 from hypothesis.errors import UnsatisfiedAssumption
 from hypothesis.internal.conjecture.engine import ConjectureRunner
@@ -50,7 +50,7 @@ DATA_DIR = os.path.join(
 
 BENCHMARK_SETTINGS = settings(
     max_examples=200, max_iterations=1000, max_shrinks=1000,
-    database=None, timeout=-1,
+    database=None, timeout=unlimited,
 )
 
 

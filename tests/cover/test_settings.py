@@ -187,6 +187,33 @@ def test_deprecate_uses_default():
             note_deprecation('Hi')
 
 
+def test_cannot_set_deprecated_settings_with_strict():
+    with pytest.raises(DeprecationWarning):
+        settings(timeout=3)
+
+
+def test_can_set_deprecated_settings_on_non_strict():
+    has_timeout = settings(timeout=3, strict=False)
+    assert has_timeout.timeout == 3
+
+
+def test_set_deprecated_settings_if_nonstrict():
+    with settings(strict=False):
+        assert settings(timeout=3).timeout == 3
+
+
+def test_can_inherit_from_deprecated_settings_even_while_strict():
+    with settings(strict=False):
+        parent = settings(timeout=3)
+
+    child = settings(parent, strict=True)
+    assert child.timeout == 3
+
+
+def test_setting_to_future_value_gives_future_value_and_no_error():
+    assert settings(timeout=hypothesis.unlimited).timeout == -1
+
+
 def test_cannot_set_settings():
     x = settings()
     with pytest.raises(AttributeError):
