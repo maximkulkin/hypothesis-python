@@ -489,6 +489,7 @@ class HealthCheck(Enum):
     too_slow = 3
     random_module = 4
     return_value = 5
+    hung_test = 6
 
 
 @unique

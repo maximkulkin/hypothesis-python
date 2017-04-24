@@ -432,6 +432,9 @@ def process_arguments_to_given(
     return arguments, kwargs, test_runner, search_strategy
 
 
+HUNG_TEST_TIME_LIMIT = 5 * 60
+
+
 class StateForActualGivenExecution(object):
 
     def __init__(self, test_runner, search_strategy, test, settings, random):
@@ -446,6 +449,15 @@ class StateForActualGivenExecution(object):
         self.random = random
 
     def evaluate_test_data(self, data):
+        if (
+            time.time() - self.start_time >= HUNG_TEST_TIME_LIMIT
+        ):
+            fail_health_check(self.settings, (
+                'Your test has been running for at least five minutes. This '
+                'is probably not what you intended, so by default Hypothesis '
+                'turns it into an error.'
+            ), HealthCheck.hung_test)
+
         try:
             result = self.test_runner(data, reify_and_execute(
                 self.search_strategy, self.test,
@@ -472,7 +484,7 @@ class StateForActualGivenExecution(object):
 
     def run(self):
         database_key = str_to_bytes(fully_qualified_name(self.test))
-        start_time = time.time()
+        self.start_time = time.time()
         runner = ConjectureRunner(
             self.evaluate_test_data,
             settings=self.settings, random=self.random,
@@ -480,7 +492,7 @@ class StateForActualGivenExecution(object):
         )
         runner.run()
         note_engine_for_statistics(runner)
-        run_time = time.time() - start_time
+        run_time = time.time() - self.start_time
         timed_out = runner.exit_reason == ExitReason.timeout
         if runner.last_data is None:
             return
