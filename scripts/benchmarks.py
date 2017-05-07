@@ -23,7 +23,6 @@ import os
 import sys
 import gzip
 import json
-import math
 import base64
 import random
 import hashlib
@@ -35,7 +34,6 @@ import attr
 import click
 import hypothesis.strategies as st
 from hypothesis import settings
-from scipy.stats import ttest_ind
 from hypothesis.errors import UnsatisfiedAssumption
 from hypothesis.internal.conjecture.engine import ConjectureRunner
 
@@ -162,7 +160,23 @@ def run_benchmark_for_sizes(benchmark, n_runs):
 
 
 def benchmark_difference_p_value(existing, recent):
-    return ttest_ind(existing, recent, equal_var=False)[1]
+    rnd = random.Random(0)
+
+    threshold = abs(np.mean(existing) - np.mean(recent))
+    n = len(existing)
+
+    n_runs = 1000
+    greater = 0
+
+    all_values = existing + recent
+    for _ in range(n_runs):
+        rnd.shuffle(all_values)
+        l = all_values[:n]
+        r = all_values[n:]
+        score = abs(np.mean(l) - np.mean(r))
+        if score >= threshold:
+            greater += 1
+    return greater / n_runs
 
 
 def benchmark_file(name):
@@ -386,18 +400,6 @@ def cli(
             old_data = existing_data(name)
 
             pp = benchmark_difference_p_value(old_data, new_data)
-
-            if math.isnan(pp):
-                # Sometimes we have benchmarks which are very consistent in
-                # their behaviour and always produce the unique minimal
-                # failing example immediately. These should be excluded from
-                # the test because they're not meaningful for comparison.
-                assert len(set(new_data)) == len(set(old_data)) == 1
-                assert new_data[0] == old_data[0]
-                click.echo('Skipping %s due to trivial benchmark' % (
-                    name,
-                ))
-                continue
 
             click.echo('p-value for difference %.5f' % (pp,))
             reports.append(Report(
