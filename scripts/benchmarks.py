@@ -160,6 +160,18 @@ def run_benchmark_for_sizes(benchmark, n_runs):
 
 
 def benchmark_difference_p_value(existing, recent):
+    """This is a bootstrapped permutation test for the difference of means.
+
+    Under the null hypothesis that the two sides come from the same
+    distribution, we can randomly reassign values to different populations and
+    see how large a difference in mean we get. This gives us a p-value for our
+    actual observed difference in mean by counting the fraction of times our
+    resampling got a value that large.
+
+    See https://en.wikipedia.org/wiki/Resampling_(statistics)#Permutation_tests
+    for details.
+
+    """
     rnd = random.Random(0)
 
     threshold = abs(np.mean(existing) - np.mean(recent))
