@@ -22,6 +22,16 @@ You should generally assume that an API is internal unless you have specific
 information to the contrary.
 
 ------------------
+3.8.6 - TBD
+------------------
+
+This contains a number of improvements to test case reduction. Failing test
+cases should now in some cases complete much faster.
+
+This may also result in some changes to the quality of the final examples - it
+may sometimes be better, but is more likely to get slightly worse. If you have
+
+------------------
 3.8.5 - 2017-05-16
 ------------------
 
