@@ -274,7 +274,6 @@ There is however now a timing related health check which is designed to catch
 tests that run for ages by accident. If you really want your test to run
 forever, the following code will enable that:
 
-
 .. code:: python
 
     from hypothesis import given, settings, unlimited, HealthCheck
