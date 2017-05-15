@@ -10,7 +10,7 @@ These include detecting and warning about:
 * Strategies with very slow data generation
 * Strategies which filter out too much
 * Recursive strategies which branch too much
-* Tests that are unlikely to complete in a resonable amount of time.
+* Tests that are unlikely to complete in a reasonable amount of time.
 
 If any of these scenarios are detected, Hypothesis will emit a warning about them.
 
