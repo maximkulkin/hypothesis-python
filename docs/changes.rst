@@ -22,6 +22,18 @@ You should generally assume that an API is internal unless you have specific
 information to the contrary.
 
 -------------------
+3.11.1 - 2017-05-26
+-------------------
+
+This is a bug fix release for a single bug:
+
+* If a test raised a "skip test" exception, Hypothesis would ignore the
+  exception and continue to run the test.  This could cause a skipped test to
+  include a falsifying example in the output.  Hypothesis will now respect
+  skip test exceptions and not print anything to stdout.
+  (`#514 <https://github.com/HypothesisWorks/hypothesis-python/issues/514>`_)
+
+-------------------
 3.11.0 - 2017-05-23
 -------------------
 
