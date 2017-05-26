@@ -49,8 +49,6 @@ from hypothesis.searchstrategy.strategies import SearchStrategy
 from hypothesis.internal.conjecture.engine import ExitReason, \
     ConjectureRunner
 
-import unittest
-
 
 def new_random():
     import random
